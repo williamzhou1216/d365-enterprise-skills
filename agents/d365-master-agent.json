@@ -11,7 +11,7 @@
         "数据模型",
         "实施"
       ],
-      "skill": "d365-solution-architect"
+      "skill": "consulting/d365-solution-architect"
     },
     {
       "keywords": [
@@ -20,7 +20,7 @@
         "投标",
         "竞争"
       ],
-      "skill": "pre-sales-strategist"
+      "skill": "consulting/pre-sales-strategist"
     },
     {
       "keywords": [
@@ -30,7 +30,7 @@
         "标准",
         "定制"
       ],
-      "skill": "fit-gap-analyst"
+      "skill": "consulting/fit-gap-analyst"
     },
     {
       "keywords": [
@@ -39,7 +39,7 @@
         "PPT",
         "汇报"
       ],
-      "skill": "proposal-delivery-writer"
+      "skill": "consulting/proposal-delivery-writer"
     },
     {
       "keywords": [
@@ -49,7 +49,7 @@
         "quote",
         "order"
       ],
-      "skill": "d365-sales-expert"
+      "skill": "product/d365-sales-expert"
     },
     {
       "keywords": [
@@ -58,7 +58,7 @@
         "sla",
         "知识库"
       ],
-      "skill": "d365-customer-service-expert"
+      "skill": "product/d365-customer-service-expert"
     },
     {
       "keywords": [
@@ -69,7 +69,7 @@
         "chat",
         "email"
       ],
-      "skill": "d365-omnichannel-expert"
+      "skill": "product/d365-omnichannel-expert"
     },
     {
       "keywords": [
@@ -78,7 +78,7 @@
         "派工",
         "库存"
       ],
-      "skill": "d365-field-service-expert"
+      "skill": "product/d365-field-service-expert"
     },
     {
       "keywords": [
@@ -88,7 +88,7 @@
         "power pages",
         "power bi"
       ],
-      "skill": "power-platform-expert"
+      "skill": "product/power-platform-expert"
     },
     {
       "keywords": [
@@ -98,7 +98,7 @@
         "action",
         "fallback"
       ],
-      "skill": "copilot-studio-expert"
+      "skill": "product/copilot-studio-expert"
     },
     {
       "keywords": [
@@ -108,7 +108,7 @@
         "部署",
         "集成"
       ],
-      "skill": "d365-architecture-designer"
+      "skill": "architecture/d365-architecture-designer"
     },
     {
       "keywords": [
@@ -118,7 +118,7 @@
         "审计",
         "归档"
       ],
-      "skill": "dataverse-data-architect"
+      "skill": "architecture/dataverse-data-architect"
     },
     {
       "keywords": [
@@ -128,7 +128,7 @@
         "team",
         "field security"
       ],
-      "skill": "security-role-designer"
+      "skill": "architecture/security-role-designer"
     },
     {
       "keywords": [
@@ -139,7 +139,7 @@
         "graph",
         "api"
       ],
-      "skill": "d365-integration-architect"
+      "skill": "architecture/d365-integration-architect"
     },
     {
       "keywords": [
@@ -148,7 +148,7 @@
         "service bus",
         "event grid"
       ],
-      "skill": "azure-integration-expert"
+      "skill": "architecture/azure-integration-expert"
     },
     {
       "keywords": [
@@ -157,7 +157,7 @@
         "pipeline",
         "pcf"
       ],
-      "skill": "d365-plugin-developer"
+      "skill": "engineering/d365-plugin-developer"
     },
     {
       "keywords": [
@@ -167,7 +167,7 @@
         "异常",
         "性能"
       ],
-      "skill": "power-automate-architect"
+      "skill": "engineering/power-automate-architect"
     },
     {
       "keywords": [
@@ -176,7 +176,7 @@
         "用例",
         "覆盖"
       ],
-      "skill": "test-case-designer"
+      "skill": "delivery/test-case-designer"
     },
     {
       "keywords": [
@@ -185,7 +185,7 @@
         "缺陷",
         "返工"
       ],
-      "skill": "uat-support-expert"
+      "skill": "delivery/uat-support-expert"
     },
     {
       "keywords": [
@@ -194,7 +194,7 @@
         "部署",
         "迁移"
       ],
-      "skill": "release-deployment-manager"
+      "skill": "delivery/release-deployment-manager"
     },
     {
       "keywords": [
@@ -204,7 +204,7 @@
         "日志",
         "API"
       ],
-      "skill": "d365-troubleshooting-expert"
+      "skill": "operations/d365-troubleshooting-expert"
     },
     {
       "keywords": [
@@ -213,7 +213,7 @@
         "瓶颈",
         "并发"
       ],
-      "skill": "performance-optimizer"
+      "skill": "operations/performance-optimizer"
     },
     {
       "keywords": [
@@ -224,7 +224,58 @@
         "日志",
         "合规"
       ],
-      "skill": "data-governance-expert"
+      "skill": "operations/data-governance-expert"
+    },
+    {
+      "keywords": [
+        "spec",
+        "需求规格",
+        "规格书"
+      ],
+      "skill": "delivery/d365-requirement-spec-writer"
+    },
+    {
+      "keywords": [
+        "plan",
+        "技术设计",
+        "技术计划"
+      ],
+      "skill": "delivery/d365-technical-plan-designer"
+    },
+    {
+      "keywords": [
+        "tasks",
+        "任务",
+        "拆解"
+      ],
+      "skill": "delivery/d365-task-breakdown-manager"
+    },
+    {
+      "keywords": [
+        "analyze",
+        "质量",
+        "闸门",
+        "检查"
+      ],
+      "skill": "delivery/d365-quality-gate-analyzer"
+    },
+    {
+      "keywords": [
+        "Jest",
+        "前端单测",
+        "单元测试",
+        "前端测试"
+      ],
+      "skill": "engineering/d365-client-unit-test-expert"
+    },
+    {
+      "keywords": [
+        "MSTest",
+        "后端单测",
+        "单元测试",
+        "后端测试"
+      ],
+      "skill": "engineering/d365-server-unit-test-expert"
     }
   ]
 }
