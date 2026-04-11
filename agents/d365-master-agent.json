@@ -1,0 +1,230 @@
+{
+  "name": "d365-master-agent",
+  "description": "D365 Enterprise Skills master agent (detailed version)",
+  "strategy": "multi-skill",
+  "routing": [
+    {
+      "keywords": [
+        "方案",
+        "架构",
+        "设计",
+        "数据模型",
+        "实施"
+      ],
+      "skill": "d365-solution-architect"
+    },
+    {
+      "keywords": [
+        "售前",
+        "demo",
+        "投标",
+        "竞争"
+      ],
+      "skill": "pre-sales-strategist"
+    },
+    {
+      "keywords": [
+        "fit",
+        "gap",
+        "差距",
+        "标准",
+        "定制"
+      ],
+      "skill": "fit-gap-analyst"
+    },
+    {
+      "keywords": [
+        "文档",
+        "方案书",
+        "PPT",
+        "汇报"
+      ],
+      "skill": "proposal-delivery-writer"
+    },
+    {
+      "keywords": [
+        "销售",
+        "lead",
+        "opportunity",
+        "quote",
+        "order"
+      ],
+      "skill": "d365-sales-expert"
+    },
+    {
+      "keywords": [
+        "客服",
+        "case",
+        "sla",
+        "知识库"
+      ],
+      "skill": "d365-customer-service-expert"
+    },
+    {
+      "keywords": [
+        "omnichannel",
+        "routing",
+        "queue",
+        "voice",
+        "chat",
+        "email"
+      ],
+      "skill": "d365-omnichannel-expert"
+    },
+    {
+      "keywords": [
+        "field service",
+        "工单",
+        "派工",
+        "库存"
+      ],
+      "skill": "d365-field-service-expert"
+    },
+    {
+      "keywords": [
+        "power platform",
+        "dataverse",
+        "power apps",
+        "power pages",
+        "power bi"
+      ],
+      "skill": "power-platform-expert"
+    },
+    {
+      "keywords": [
+        "copilot studio",
+        "bot",
+        "knowledge",
+        "action",
+        "fallback"
+      ],
+      "skill": "copilot-studio-expert"
+    },
+    {
+      "keywords": [
+        "架构图",
+        "mermaid",
+        "逻辑",
+        "部署",
+        "集成"
+      ],
+      "skill": "d365-architecture-designer"
+    },
+    {
+      "keywords": [
+        "数据模型",
+        "实体",
+        "关系",
+        "审计",
+        "归档"
+      ],
+      "skill": "dataverse-data-architect"
+    },
+    {
+      "keywords": [
+        "权限",
+        "security role",
+        "bu",
+        "team",
+        "field security"
+      ],
+      "skill": "security-role-designer"
+    },
+    {
+      "keywords": [
+        "集成",
+        "sap",
+        "oms",
+        "bc",
+        "graph",
+        "api"
+      ],
+      "skill": "d365-integration-architect"
+    },
+    {
+      "keywords": [
+        "azure",
+        "logic apps",
+        "service bus",
+        "event grid"
+      ],
+      "skill": "azure-integration-expert"
+    },
+    {
+      "keywords": [
+        "plugin",
+        "c#",
+        "pipeline",
+        "pcf"
+      ],
+      "skill": "d365-plugin-developer"
+    },
+    {
+      "keywords": [
+        "flow",
+        "power automate",
+        "审批",
+        "异常",
+        "性能"
+      ],
+      "skill": "power-automate-architect"
+    },
+    {
+      "keywords": [
+        "测试",
+        "test case",
+        "用例",
+        "覆盖"
+      ],
+      "skill": "test-case-designer"
+    },
+    {
+      "keywords": [
+        "uat",
+        "验收",
+        "缺陷",
+        "返工"
+      ],
+      "skill": "uat-support-expert"
+    },
+    {
+      "keywords": [
+        "上线",
+        "发布",
+        "部署",
+        "迁移"
+      ],
+      "skill": "release-deployment-manager"
+    },
+    {
+      "keywords": [
+        "报错",
+        "故障",
+        "排查",
+        "日志",
+        "API"
+      ],
+      "skill": "d365-troubleshooting-expert"
+    },
+    {
+      "keywords": [
+        "性能",
+        "优化",
+        "瓶颈",
+        "并发"
+      ],
+      "skill": "performance-optimizer"
+    },
+    {
+      "keywords": [
+        "数据治理",
+        "容量",
+        "审计",
+        "归档",
+        "日志",
+        "合规"
+      ],
+      "skill": "data-governance-expert"
+    }
+  ]
+}

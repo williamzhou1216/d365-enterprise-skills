@@ -1,27 +1,14 @@
-# D365 Enterprise Skills Library
 
-This repository contains a curated, production-ready skill library for Dynamics 365 + Power Platform (consulting/implementation lifecycle).
+# D365 Enterprise Skills Library（Detailed）
 
-## Repository structure
+This repo contains D365 + Power Platform skills, one skill per folder, each with a detailed `SKILL.md` designed for real-world consulting/delivery.
 
-```
-- agents/
-  - d365-master-agent.json
-- skills/
-  (multiple skill folders, each with SKILL.md)
-- install.sh
-- LICENSE (MIT)
-```
-
-## Setup
-
-1. Clone this repo
-2. Run `install.sh` to copy skills + agent definition into `~/.openclaw`
-3. Restart OpenClaw
+## Installation to OpenClaw
+- Copy `skills/` to `~/.openclaw/skills/d365-enterprise`
+- Copy `agents/d365-master-agent.json` to `~/.openclaw/agents`
+- Restart OpenClaw
 
 ## Skills
-
-Core skills include (recommended starting set):
 - d365-solution-architect
 - pre-sales-strategist
 - fit-gap-analyst
@@ -46,4 +33,3 @@ Core skills include (recommended starting set):
 - performance-optimizer
 - data-governance-expert
 
-Each SKILL.md follows a consistent template: ROLE, OBJECTIVE, OUTPUT STRUCTURE, RULES.
