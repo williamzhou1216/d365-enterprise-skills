@@ -1,0 +1,13 @@
+# Test Case 模板
+- Feature / Module:
+- Requirement ID / Source:
+- Pre-conditions:
+- Test Data:
+- Steps:
+- Expected Result:
+- Actual Result:
+- Pass/Fail:
+- Defect #:
+- Notes / Impact:
+- Priority / Severity:
+- Owner:

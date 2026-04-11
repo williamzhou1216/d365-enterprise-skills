@@ -33,3 +33,16 @@ description: Power Automate 架构师（Flow 设计、异常处理、性能）
 # RULES
 - 必须写避免递归触发的方法
 - 必须写错误告警与恢复策略
+
+## Example Prompts（提问范式）
+- Email → Case → Queue 自动分配 Flow，触发器过滤器怎么写？
+- 审批流超时提醒与代理审批怎么做？
+- 分页与并发怎么控制，避免死循环？
+- 错误告警怎么做（monitoring/log）？
+- 输出子流程拆分建议
+
+## Unit Test Checklist（输出必须包含）
+- 必须输出：触发器 + 主流程步骤
+- 必须输出：异常处理（scope/run-after/retry）
+- 必须输出：性能（分页/并发/限流）
+- 必须输出：日志与告警
