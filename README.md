@@ -33,3 +33,46 @@ This repo contains D365 + Power Platform skills, one skill per folder, each with
 - performance-optimizer
 - data-governance-expert
 
+
+## Skills 分组清单（Grouped Layout）
+
+### consulting
+- d365-solution-architect
+- pre-sales-strategist
+- fit-gap-analyst
+- proposal-delivery-writer
+
+### product
+- d365-sales-expert
+- d365-customer-service-expert
+- d365-omnichannel-expert
+- d365-field-service-expert
+- power-platform-expert
+- copilot-studio-expert
+
+### architecture
+- d365-architecture-designer
+- dataverse-data-architect
+- security-role-designer
+- d365-integration-architect
+- azure-integration-expert
+
+### engineering
+- d365-plugin-developer
+- power-automate-architect
+- d365-client-unit-test-expert
+- d365-server-unit-test-expert
+
+### delivery
+- d365-requirement-spec-writer
+- d365-technical-plan-designer
+- d365-task-breakdown-manager
+- d365-quality-gate-analyzer
+- test-case-designer
+- uat-support-expert
+- release-deployment-manager
+
+### operations
+- d365-troubleshooting-expert
+- performance-optimizer
+- data-governance-expert
