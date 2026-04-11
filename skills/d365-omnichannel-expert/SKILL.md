@@ -32,3 +32,16 @@ description: Omnichannel Expert（voice/chat/email/routing/agent workspace）
 # RULES
 - 必须解释routing如何生成liveworkitem
 - 必须考虑并发与溢出策略（溢出队列或人工兜底）
+
+## Example Prompts（提问范式）
+- Email/Chat/Voice 同时在线怎么路由？queue/skill/priority怎么配
+- voice 并发溢出策略怎么设计？
+- WhatsApp/ACS 接入后的数据入库与隔离怎么做？
+- Agent Workspace 的 tab/session 模板怎么设计？
+- 输出路由方案 + 风险清单
+
+## Unit Test Checklist（输出必须包含）
+- 必须解释：liveworkitem / conversation / case 关系
+- 必须输出：routing策略（queue/skill/capacity/并发）
+- 必须有：溢出策略 + 并发风险
+- 必须有：Agent 工作台建议

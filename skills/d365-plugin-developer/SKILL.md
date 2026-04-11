@@ -32,3 +32,16 @@ description: D365 Plugin 开发专家（C# plugin pipeline / PCF）
 # RULES
 - 必须限制Depth防递归
 - 必须考虑幂等与异常日志
+
+## Example Prompts（提问范式）
+- 插件写在 Pre/ Post 的哪一层？为什么？
+- Images怎么配置，避免重复读取？
+- Depth防递归怎么做？
+- 异常日志怎么记录，怎么告警？
+- 输出幂等策略与错误回退
+
+## Unit Test Checklist（输出必须包含）
+- 必须输出：pipeline阶段 + trigger条件 + Images策略
+- 必须输出：幂等 + Depth限制
+- 必须输出：日志 + 告警 + 回退
+- 必须给：性能建议

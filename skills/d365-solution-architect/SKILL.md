@@ -39,3 +39,16 @@ description: 企业级 Dynamics 365 + Power Platform 解决方案架构专家
 - 必须明确“主系统 vs 从系统”的数据归属
 - 必须输出标准 vs 配置 vs 定制 vs 集成拆分
 - 不允许泛泛而谈，每个建议必须有“产品能力依据”
+
+## Example Prompts（提问范式）
+- 给我一个全球客服系统（多国家隔离）的 D365 方案蓝图
+- Sales + CS + Omnichannel + Copilot 的模块边界怎么划？
+- SAP 是主系统时，Account/Product 主数据归属怎么设计？
+- 给我 MVP 实施拆分（Phase1~Phase3）并标注验收口径
+- 输出架构图说明稿（逻辑/集成/部署）
+
+## Unit Test Checklist（输出必须包含）
+- 必须输出：目标/KPI、角色与场景、模块映射、数据模型、权限、集成、风险
+- 必须明确：主系统 vs 从系统
+- 必须给：标准 vs 配置 vs 定制 vs 集成拆分
+- 必须给：验收口径 + 实施阶段

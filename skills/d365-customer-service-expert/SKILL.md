@@ -31,3 +31,15 @@ description: D365 Customer Service 产品专家（Case / SLA / Knowledge）
 # RULES
 - 必须输出“标准优先，定制兜底”
 - 必须输出验证步骤与验收口径
+
+## Example Prompts（提问范式）
+- 设计 Case 生命周期 + SLA + Entitlement
+- 知识库沉淀怎么做（标准能力/权限）
+- Supervisor 报表与监控怎么定义与实现
+- Case 升级到管理层时需要哪些字段与通知
+- 输出流程与配置点清单
+
+## Unit Test Checklist（输出必须包含）
+- 必须输出：Case 流程、SLA策略、知识库、权限、报表
+- 必须明确：标准 vs 定制
+- 必须有：验收口径（响应/解决/满意度等）

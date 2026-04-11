@@ -31,3 +31,16 @@ description: Copilot Studio 专家（topic/knowledge/action/fallback）
 # RULES
 - 必须输出“标准优先，定制兜底”
 - 必须输出验证步骤与验收口径
+
+## Example Prompts（提问范式）
+- 设计 Copilot Studio：topic / knowledge / action / fallback
+- Generative answers 信心阈值怎么设置？
+- fallback 话术与转人工策略怎么做？
+- bot action 触发Dataverse更新怎么设计？
+- 多语言怎么处理？
+
+## Unit Test Checklist（输出必须包含）
+- 必须输出：intent/topic/knowledge/action/fallback
+- 必须给：信心阈值 + 兜底策略
+- 必须给：安全边界（只读/只写/敏感字段）
+- 必须给：验收口径（命中率、转人工满意度等）
