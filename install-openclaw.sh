@@ -12,7 +12,12 @@ git -C "$REPO_DIR" pull || true
 mkdir -p "$SKILL_TARGET" "$AGENT_TARGET"
 rm -rf "$SKILL_TARGET"/*
 
-cp -R "$REPO_DIR"/openclaw-skills/* "$SKILL_TARGET"/
+find "$REPO_DIR/skills" -mindepth 1 -maxdepth 1 -type d -exec sh -c '
+  for d do
+    [ -f "$d/SKILL.md" ] || continue
+    cp -R "$d" "$0"/
+  done
+' "$SKILL_TARGET" {} +
 cp "$REPO_DIR/agents/d365-master-agent.json" "$AGENT_TARGET"/
 
 echo "Installed for OpenClaw"

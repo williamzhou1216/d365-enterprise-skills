@@ -9,10 +9,13 @@ git -C "$REPO_DIR" pull || true
 "$REPO_DIR/scripts/build_flat_skills.sh"
 
 mkdir -p "$TARGET_DIR"
-rm -f "$TARGET_DIR"/* 2>/dev/null || true
 
-for d in "$REPO_DIR"/opencode-skills/*; do
-  [ -d "$d" ] && ln -sfn "$d" "$TARGET_DIR/$(basename "$d")"
+for d in "$REPO_DIR"/skills/*; do
+  [ -d "$d" ] || continue
+  [ -f "$d/SKILL.md" ] || continue
+  skill_name="$(basename "$d")"
+  rm -rf "$TARGET_DIR/$skill_name"
+  ln -sfn "$d" "$TARGET_DIR/$skill_name"
 done
 
 echo "Installed for OpenCode"
