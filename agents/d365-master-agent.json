@@ -155,7 +155,16 @@
         "plugin",
         "c#",
         "pipeline",
-        "pcf"
+        "pcf",
+        "prevalidation",
+        "preoperation",
+        "postoperation",
+        "image",
+        "preimage",
+        "postimage",
+        "depth",
+        "custom api",
+        "插件"
       ],
       "skill": "engineering/d365-plugin-developer"
     },

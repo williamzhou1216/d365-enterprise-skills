@@ -23,10 +23,12 @@ description: D365 技术设计与实施计划编排专家（把 spec 转成 plan
 ## OUTPUT STRUCTURE（必须）
 - 技术边界与系统关系（主系统/从系统/调用方向）
 - 前后端分工与落点：Plugin/Custom API/JS/Flow/配置项
+- 企业工程分层落点：Plugins / Sdk(Handler) / BLL / WebResource / UnitTest / Deploy
 - 数据模型确认：实体类型、查找字段、选项集、审计、主数据归属
 - 性能目标与容量假设（并发/队列/Activity/附件）
 - 安全设计：敏感字段、共享策略、field security
 - 交付产物映射：哪些文件/配置必须更新（例如 registration/webresource/metadata）
+- 企业交付约束：配置文件、日志、签名、ILMerge、spkl、多语言资源、包版本策略
 - 测试策略：server UT / client UT / integration / UAT
 
 ## Example Prompts（提问范式）
@@ -37,6 +39,7 @@ description: D365 技术设计与实施计划编排专家（把 spec 转成 plan
 
 ## Unit Test Checklist（输出必须包含）
 - plan 必须明确：每条需求由谁实现（代码/配置/集成）
+- 必须明确：代码落到哪一层，哪些逻辑不能写进入口插件或前端页面
 - 必须输出：后端校验/幂等/异常处理策略
 - 必须输出：性能与安全限制
 - 必须输出：测试入口与覆盖范围

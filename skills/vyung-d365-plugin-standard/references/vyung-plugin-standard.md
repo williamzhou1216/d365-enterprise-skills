@@ -159,7 +159,102 @@
 7. 单元测试与覆盖率建议
 8. 风险与待确认项
 
-## 9. 已知局限
-当前摘要基于本地 PDF 文件名、PDF 内锚点、章节标题和可识别方法名整理而成；正文内容并未完整提取。因此：
-- 可以安全用于生成 skill、流程、检查清单和实现框架。
-- 若后续拿到可复制文本版 wiki，可继续把本文件补全为更细的规范手册。
+## 9. 基于实际代码仓库补充的现行规范
+以下内容来自对 `E:\VyungDevops\Git\产品部\标准化\standard` 与 `E:\VyungDevops\Git\产品部\审批流\Vyung.BIZ.Flow` 两个仓库的实际代码结构与实现习惯的补充整理，可视为“文档标准 + 真实项目落地方式”的合并摘要。
+
+### 9.1 工程分层
+- 标准框架层通常命名为 `Vyung.Xrm.*`，用于承载插件基类、日志、配置、扩展方法、控制台基座等公共能力。
+- 业务交付层通常命名为 `Vyung.Crm.*` 或 `Vyung.BIZ.*`，用于承载具体解决方案代码。
+- 审批流类项目已形成较明显的分层：`Plugins`、`Sdk`、`UnitTest`、`WebResource`、`Consoles`、`PkgDeploy`。
+
+落地要求：
+- 输出方案时要先判断代码放在哪一层，不要默认所有逻辑都进 `Plugins`。
+- 插件入口只做上下文组装、参数获取和流程路由；复杂业务应下沉到 `BLL / FlowEngine / Handler`。
+
+### 9.2 插件入口模式
+- 微扬现有代码同时存在 `PluginBase` 与 `XrmPluginBase` 两套基类。
+- 插件类通常包含固定的 `#region Constructor/Configuration`，接收 `unsecure` 与 `secureConfig`，并在构造函数中 `: base(typeof(CurrentPlugin))`。
+- 插件执行入口通常重写 `ExecuteCrmPlugin(...)`，从 `LocalPluginContext / XrmLocalPluginContext` 获取：
+  - `OrganizationService`
+  - `OrganizationAdminService`
+  - `PluginExecutionContext`
+  - `TracingService`
+
+落地要求：
+- 若是维护现有项目，先遵循项目已采用的基类，不要在同一模块随意混用两套入口模型。
+- 若是新模块，建议统一到单一基类风格，并明确迁移边界。
+
+### 9.3 组织服务使用边界
+- 现有项目大量区分 `OrganizationService` 与 `OrganizationAdminService`。
+- 常规用户上下文逻辑使用 `OrganizationService`。
+- 元数据、系统配置、跨权限读取等更偏平台管理的操作常使用 `OrganizationAdminService`。
+
+落地要求：
+- 方案中必须说明“当前调用为何用用户服务或管理员服务”。
+- 涉及权限差异、语言、多实体元数据、部署操作时，要特别审查是否误用了用户服务。
+
+### 9.4 审批流解决方案模式
+- 审批流中，旧模式常见于 `Action` 入口类根据 `actionCode` 分发，再调用 `BLL`。
+- 新模式正在向 `Sdk Request + Handler + FlowClient` 演进，使业务能力可脱离插件入口复用。
+- `BaseFlowBLL` 一类基类负责聚合上下文、语言、目标单据、审批实例等通用初始化逻辑。
+
+落地要求：
+- 对审批流或复杂插件，优先把业务能力设计成可复用的处理器或 BLL，而不是继续放大入口类中的分支逻辑。
+- 新增动作应优先补 `Request/Response/Handler` 或明确职责的 BLL，再由入口层暴露给插件或 Action。
+
+### 9.5 WebResource 与多语言
+- 现有审批流前端资源采用 `vy_/...` 命名空间组织。
+- 多语言资源放在 `vy_/locale/*.json`，按 LCID 区分。
+- `spkl.json` 中显式登记大量 HTML / JS / locale 资源。
+- 前端全局命名空间常见为 `Vyung`、`FlowUtil`。
+
+落地要求：
+- 新增前端功能时，要同步考虑 WebResource 文件、`spkl.json`、多语言 JSON、按钮和窗体脚本。
+- 新增按钮、规则、对话页或移动端页面时，要检查桌面端与移动端资源是否同时覆盖。
+
+### 9.6 测试风格
+- 现有测试大量使用 `ServiceProviderBase` + `Rhino.Mocks` 模拟 `IServiceProvider`、`IPluginExecutionContext`、`ITracingService`。
+- 同时，测试也常连接真实 CRM 环境并读取真实记录，这更接近“集成辅助测试”或“场景测试”，不是纯离线单元测试。
+
+落地要求：
+- 输出测试方案时必须区分：纯单元测试、集成辅助测试、场景测试。
+- 依赖真实环境的测试要明确环境、账号、前置数据、可重复执行性和失败恢复方式。
+
+### 9.7 打包与交付
+- 插件项目通常启用强签名。
+- 项目使用 ILMerge 合并依赖，并通过 `ILMergeConfig.json` 显式控制。
+- WebResource 部署使用 `spkl`。
+- 解决方案导入/部署还可能涉及 `PkgDeploy`。
+
+落地要求：
+- 任何新增依赖都要检查是否影响强签名、ILMerge、spkl 或部署包。
+- 交付清单中不能只写代码文件，还要写清楚部署与打包工件。
+
+## 10. 建议补强点
+结合现有实际代码，建议在后续项目中逐步补强以下做法：
+
+### 10.1 统一基类与框架版本
+- 减少 `PluginBase` 与 `XrmPluginBase` 混用。
+- 减少包版本漂移，建立明确的推荐版本基线。
+
+### 10.2 消除配置硬编码
+- 不建议在插件中直接硬编码 `C:\CRMConfig\Vyung.Xrm.config`。
+- 建议增加统一配置解析入口，或在宿主层注入配置路径与关键参数。
+
+### 10.3 强化“薄入口，厚业务”
+- 不建议继续扩大超长 `actionCode if/else` 或大型插件入口类。
+- 建议优先抽成可测试的 `Handler / Service / BLL`，入口类只做协议适配。
+
+### 10.4 区分测试类型
+- 现有“单元测试”中有相当一部分依赖真实环境，后续应显式区分并命名。
+- 建议核心业务逻辑逐步补齐真正可离线运行的单元测试。
+
+### 10.5 前端现代化
+- 现有前端仍可见 `Xrm.Page`、同步 Ajax 等旧模式。
+- 新增代码应优先使用 `formContext`、异步调用、可维护的模块边界，并保持与既有全局命名空间兼容。
+
+## 11. 已知局限
+当前摘要基于本地 PDF 文件、标准仓库代码与审批流源码的静态阅读整理而成，因此：
+- 可以安全用于生成 skill、流程、检查清单、评审规则和实现框架。
+- 对“团队实际口头约定但未落到代码/文档”的规范仍可能覆盖不全。
+- 若后续拿到更多内部 wiki、代码评审清单或发布流程文档，可继续把本文件补全为更细的规范手册。

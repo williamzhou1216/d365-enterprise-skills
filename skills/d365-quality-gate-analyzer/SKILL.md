@@ -23,6 +23,7 @@ description: D365 质量闸门检查专家（analyze 阶段）
 - 规则归属一致性（前端 vs 后端）
 - 风险列表与必须补齐项
 - merge gate 的“通行/不通行”建议
+- 对企业标准项目，还要检查是否符合既有工程分层、配置、打包和测试规范
 
 ## OUTPUT STRUCTURE（必须）
 - 需求覆盖检查：哪些需求缺任务/缺实现/缺测试
@@ -31,6 +32,11 @@ description: D365 质量闸门检查专家（analyze 阶段）
 - 性能风险：Omnichannel 并发、Activity 膨胀、Flow 节流
 - 安全风险：敏感字段、共享策略、field security
 - 工件一致性：registration/metadata/webresource 与计划一致
+- 企业框架一致性：是否遵守既有分层（Plugins / Sdk / UnitTest / WebResource / PkgDeploy）
+- 配置与日志一致性：是否硬编码环境路径、连接信息、日志路径或密钥
+- 测试真实性检查：是否把真实 CRM 依赖测试误标为单元测试
+- 打包发布一致性：签名、ILMerge、spkl、PkgDeploy、多语言资源是否同步更新
+- 代码现代化风险：是否继续扩大旧框架混用、`Xrm.Page`、同步 Ajax、超大 action switch
 - 结论：通行/不通行 + 必须补齐清单
 
 ## Example Prompts（提问范式）
@@ -41,5 +47,6 @@ description: D365 质量闸门检查专家（analyze 阶段）
 
 ## Unit Test Checklist（输出必须包含）
 - 必须检查：需求覆盖率 + 校验策略 + 性能/安全
+- 必须检查：工程分层、配置硬编码、测试分类、部署工件一致性
 - 必须输出 gate 的通行条件
 - 禁止只输出“应该没问题”，必须有证据（覆盖清单）
