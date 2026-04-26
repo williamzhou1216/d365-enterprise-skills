@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "d365": {
+      "type": "local",
+      "command": "node",
+      "args": [
+        "./mcp-servers/d365-mcp/dist/index.js"
+      ],
+      "enabled": true,
+      "env": {
+        "D365_PROFILE": "{env:D365_PROFILE}",
+        "D365_CONNECTIONS_FILE": "{env:D365_CONNECTIONS_FILE}"
+      }
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/d365-connections.schema.json",
+  "title": "d365-connections",
+  "type": "object",
+  "required": [
+    "profiles"
+  ],
+  "properties": {
+    "defaultProfile": {
+      "type": "string"
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/profile"
+      }
+    }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "required": [
+        "displayName",
+        "deploymentType",
+        "authType",
+        "apiType",
+        "readonly"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string"
+        },
+        "deploymentType": {
+          "enum": [
+            "online",
+            "onprem",
+            "onprem-ifd"
+          ]
+        },
+        "authType": {
+          "enum": [
+            "oauth-client-credentials",
+            "windows-integrated",
+            "adfs-claims",
+            "adfs-oauth"
+          ]
+        },
+        "apiType": {
+          "enum": [
+            "webapi",
+            "organization-service"
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "urlEnv": {
+          "type": "string"
+        },
+        "webApiUrlEnv": {
+          "type": "string"
+        },
+        "organizationServiceUrlEnv": {
+          "type": "string"
+        },
+        "tenantIdEnv": {
+          "type": "string"
+        },
+        "clientIdEnv": {
+          "type": "string"
+        },
+        "clientSecretEnv": {
+          "type": "string"
+        },
+        "usernameEnv": {
+          "type": "string"
+        },
+        "passwordEnv": {
+          "type": "string"
+        },
+        "domainEnv": {
+          "type": "string"
+        },
+        "adfsUrlEnv": {
+          "type": "string"
+        },
+        "adfsAuthorityEnv": {
+          "type": "string"
+        },
+        "redirectUriEnv": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "authType": {
+                "const": "oauth-client-credentials"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "urlEnv",
+              "tenantIdEnv",
+              "clientIdEnv",
+              "clientSecretEnv"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "authType": {
+                "const": "windows-integrated"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "organizationServiceUrlEnv",
+              "usernameEnv",
+              "passwordEnv"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "authType": {
+                "const": "adfs-claims"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "organizationServiceUrlEnv",
+              "adfsUrlEnv",
+              "usernameEnv",
+              "passwordEnv"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "authType": {
+                "const": "adfs-oauth"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "webApiUrlEnv",
+              "adfsAuthorityEnv"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

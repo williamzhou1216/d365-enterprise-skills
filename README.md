@@ -95,3 +95,18 @@ This repo contains D365 + Power Platform skills, one skill per folder, each with
 - d365-troubleshooting-expert
 - performance-optimizer
 - data-governance-expert
+
+## d365-mcp
+
+This repo now also contains a delivery-oriented MCP server for Dynamics 365 / Dataverse:
+
+- Path: `mcp-servers/d365-mcp`
+- Purpose: secure profile-based CRM connectivity for OpenCode, metadata analysis, solution inspection, and future On-Premises connector routing
+- Setup docs: `mcp-servers/d365-mcp/README.md`
+
+Quick start:
+
+1. Run `./install-d365-mcp.sh` or `./install-d365-mcp.ps1`
+2. Fill in `.env.local`
+3. Copy `.opencode/opencode.example.jsonc` to `.opencode/opencode.jsonc`
+4. Set `D365_PROFILE` and start OpenCode

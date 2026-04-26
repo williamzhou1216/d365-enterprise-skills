@@ -1,0 +1,56 @@
+{
+  "$schema": "./d365-connections.schema.json",
+  "defaultProfile": "customerA-online-dev",
+  "profiles": {
+    "customerA-online-dev": {
+      "displayName": "Customer A Online DEV",
+      "deploymentType": "online",
+      "authType": "oauth-client-credentials",
+      "apiType": "webapi",
+      "urlEnv": "D365_CUSTOMERA_ONLINE_DEV_URL",
+      "tenantIdEnv": "D365_CUSTOMERA_ONLINE_DEV_TENANT_ID",
+      "clientIdEnv": "D365_CUSTOMERA_ONLINE_DEV_CLIENT_ID",
+      "clientSecretEnv": "D365_CUSTOMERA_ONLINE_DEV_CLIENT_SECRET",
+      "readonly": false,
+      "notes": "Recommended for DEV metadata and limited configuration inspection through Dataverse Web API."
+    },
+    "customerA-op-internal-ad": {
+      "displayName": "Customer A On-Prem Internal AD",
+      "deploymentType": "onprem",
+      "authType": "windows-integrated",
+      "apiType": "organization-service",
+      "organizationServiceUrlEnv": "D365_CUSTOMERA_OP_ORG_SERVICE_URL",
+      "domainEnv": "D365_CUSTOMERA_OP_DOMAIN",
+      "usernameEnv": "D365_CUSTOMERA_OP_USERNAME",
+      "passwordEnv": "D365_CUSTOMERA_OP_PASSWORD",
+      "readonly": false,
+      "notes": "Profile is supported now. Execution should be routed to a future .NET Organization Service connector."
+    },
+    "customerA-op-adfs-claims": {
+      "displayName": "Customer A On-Prem ADFS Claims",
+      "deploymentType": "onprem",
+      "authType": "adfs-claims",
+      "apiType": "organization-service",
+      "organizationServiceUrlEnv": "D365_CUSTOMERA_OP_CLAIMS_ORG_SERVICE_URL",
+      "adfsUrlEnv": "D365_CUSTOMERA_OP_ADFS_URL",
+      "usernameEnv": "D365_CUSTOMERA_OP_ADFS_USERNAME",
+      "passwordEnv": "D365_CUSTOMERA_OP_ADFS_PASSWORD",
+      "readonly": false,
+      "notes": "Requires Claims-Based Authentication to already be configured in the customer environment."
+    },
+    "customerA-op-ifd": {
+      "displayName": "Customer A On-Prem IFD",
+      "deploymentType": "onprem-ifd",
+      "authType": "adfs-oauth",
+      "apiType": "webapi",
+      "webApiUrlEnv": "D365_CUSTOMERA_OP_IFD_WEBAPI_URL",
+      "adfsAuthorityEnv": "D365_CUSTOMERA_OP_IFD_ADFS_AUTHORITY",
+      "clientIdEnv": "D365_CUSTOMERA_OP_IFD_CLIENT_ID",
+      "redirectUriEnv": "D365_CUSTOMERA_OP_IFD_REDIRECT_URI",
+      "usernameEnv": "D365_CUSTOMERA_OP_IFD_USERNAME",
+      "passwordEnv": "D365_CUSTOMERA_OP_IFD_PASSWORD",
+      "readonly": true,
+      "notes": "Phase-2 reserved profile. Full ADFS OAuth and Web API execution is not yet implemented."
+    }
+  }
+}

@@ -1,1 +1,8 @@
 .DS_Store
+.env.local
+config/d365-connections.json
+mcp-servers/d365-mcp/dist/
+mcp-servers/d365-mcp/node_modules/
+.opencode/opencode.jsonc
+connectors/d365-connector-dotnet/**/bin/
+connectors/d365-connector-dotnet/**/obj/
