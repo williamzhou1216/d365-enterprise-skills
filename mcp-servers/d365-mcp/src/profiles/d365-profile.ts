@@ -146,4 +146,5 @@ export interface ResolvedD365Profile extends D365ProfileDefinition {
 
 export interface SanitizedD365Profile extends D365ProfileDefinition {
   profileName: string;
+  connectionFile?: string;
 }

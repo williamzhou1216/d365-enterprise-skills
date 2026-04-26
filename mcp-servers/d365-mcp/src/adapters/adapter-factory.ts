@@ -1,4 +1,5 @@
 import type { ResolvedD365Profile } from "../profiles/d365-profile.js";
+import { throwToolError } from "../errors.js";
 import type { D365ConnectionAdapter } from "./d365-connection-adapter.js";
 import { OnlineOAuthAdapter } from "./online-oauth-adapter.js";
 import { OnPremADAdapter } from "./onprem-ad-adapter.js";
@@ -22,7 +23,14 @@ export function createConnectionAdapter(profile: ResolvedD365Profile): D365Conne
     return new OnPremIFDAdapter(profile);
   }
 
-  throw new Error(
+  throwToolError(
+    "unsupported_auth_type",
     `Unsupported profile combination: deploymentType='${profile.deploymentType}', authType='${profile.authType}', apiType='${profile.apiType}'.`,
+    {
+      profileName: profile.profileName,
+      deploymentType: profile.deploymentType,
+      authType: profile.authType,
+      apiType: profile.apiType,
+    },
   );
 }

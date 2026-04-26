@@ -1,5 +1,6 @@
 import { fetch } from "undici";
 
+import { D365ToolError } from "../errors.js";
 import type { ResolvedD365Profile } from "../profiles/d365-profile.js";
 import type { D365ConnectionAdapter } from "./d365-connection-adapter.js";
 
@@ -20,11 +21,25 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
   }
 
   async testConnection(): Promise<unknown> {
-    const whoAmI = await this.requestJson<Record<string, unknown>>("WhoAmI");
+    const whoAmI = await this.requestJson<Record<string, unknown>>("WhoAmI()");
+    const organizationName = this.profile.url ? new URL(this.profile.url).hostname.split(".")[0] : undefined;
+    let version = "unknown";
+
+    try {
+      const versionResponse = await this.requestJson<{ Version?: string }>("RetrieveVersion()");
+      if (typeof versionResponse.Version === "string" && versionResponse.Version.trim()) {
+        version = versionResponse.Version;
+      }
+    } catch {
+      version = "unknown";
+    }
 
     return {
-      status: "connected",
+      success: true,
       profileName: this.profile.profileName,
+      organizationName,
+      version,
+      user: "application-user",
       deploymentType: this.profile.deploymentType,
       authType: this.profile.authType,
       apiType: this.profile.apiType,
@@ -37,16 +52,41 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
 
   async listEntities(): Promise<unknown[]> {
     const response = await this.requestJson<{ value: unknown[] }>(
-      "EntityDefinitions?$select=LogicalName,SchemaName,EntitySetName,PrimaryIdAttribute,PrimaryNameAttribute,ObjectTypeCode,IsCustomEntity&$filter=IsIntersect eq false",
+      "EntityDefinitions?$select=LogicalName,SchemaName,EntitySetName,PrimaryIdAttribute,PrimaryNameAttribute,ObjectTypeCode,IsCustomEntity,OwnershipType,DisplayName,Description,IsActivity&$filter=IsIntersect eq false",
     );
 
     return response.value;
   }
 
   async getEntityMetadata(entityLogicalName: string): Promise<unknown> {
-    return this.requestJson(
-      `EntityDefinitions(LogicalName='${encodeURIComponent(entityLogicalName)}')?$select=LogicalName,SchemaName,EntitySetName,DisplayName,Description,ObjectTypeCode,PrimaryIdAttribute,PrimaryNameAttribute,IsActivity,IsCustomEntity`,
-    );
+    const encodedEntityLogicalName = encodeURIComponent(entityLogicalName);
+    const [entity, attributes, oneToMany, manyToOne, manyToMany] = await Promise.all([
+      this.requestJson<Record<string, unknown>>(
+        `EntityDefinitions(LogicalName='${encodedEntityLogicalName}')?$select=LogicalName,SchemaName,EntitySetName,DisplayName,Description,ObjectTypeCode,PrimaryIdAttribute,PrimaryNameAttribute,IsActivity,IsCustomEntity,OwnershipType`,
+      ),
+      this.requestJson<{ value: unknown[] }>(
+        `EntityDefinitions(LogicalName='${encodedEntityLogicalName}')/Attributes?$select=LogicalName,SchemaName,AttributeType,AttributeTypeName,Format,MaxLength,RequiredLevel,DisplayName,Description,IsCustomAttribute,IsValidForRead,IsValidForCreate,IsValidForUpdate`,
+      ),
+      this.requestJson<{ value: unknown[] }>(
+        `EntityDefinitions(LogicalName='${encodedEntityLogicalName}')/OneToManyRelationships?$select=SchemaName,ReferencedEntity,ReferencingEntity,ReferencingAttribute`,
+      ),
+      this.requestJson<{ value: unknown[] }>(
+        `EntityDefinitions(LogicalName='${encodedEntityLogicalName}')/ManyToOneRelationships?$select=SchemaName,ReferencedEntity,ReferencingEntity,ReferencingAttribute`,
+      ),
+      this.requestJson<{ value: unknown[] }>(
+        `EntityDefinitions(LogicalName='${encodedEntityLogicalName}')/ManyToManyRelationships?$select=SchemaName,Entity1LogicalName,Entity2LogicalName,IntersectEntityName`,
+      ),
+    ]);
+
+    return {
+      ...entity,
+      Attributes: attributes.value,
+      Relationships: {
+        OneToMany: oneToMany.value,
+        ManyToOne: manyToOne.value,
+        ManyToMany: manyToMany.value,
+      },
+    };
   }
 
   async getAttributeMetadata(entityLogicalName: string, attributeLogicalName: string): Promise<unknown> {
@@ -89,7 +129,9 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
     }
 
     if (!this.profile.url || !this.profile.tenantId || !this.profile.clientId || !this.profile.clientSecret) {
-      throw new Error("Online OAuth profile is missing one or more resolved credentials.");
+      throw new D365ToolError("missing_env_var", "Online OAuth profile is missing one or more resolved credentials.", {
+        profileName: this.profile.profileName,
+      });
     }
 
     const tokenUrl = `https://login.microsoftonline.com/${this.profile.tenantId}/oauth2/v2.0/token`;
@@ -112,7 +154,16 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(`Failed to acquire Dataverse token. ${response.status} ${response.statusText}: ${errorBody}`);
+      throw new D365ToolError(
+        "connection_failed",
+        `Failed to acquire Dataverse token. ${response.status} ${response.statusText}.`,
+        {
+          profileName: this.profile.profileName,
+          status: response.status,
+          statusText: response.statusText,
+          responsePreview: errorBody.slice(0, 1000),
+        },
+      );
     }
 
     const token = (await response.json()) as OAuthTokenResponse;
@@ -123,7 +174,9 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
 
   private async requestJson<T>(relativePath: string): Promise<T> {
     if (!this.profile.webApiUrl) {
-      throw new Error("Resolved profile is missing webApiUrl.");
+      throw new D365ToolError("configuration_error", "Resolved profile is missing webApiUrl.", {
+        profileName: this.profile.profileName,
+      });
     }
 
     const accessToken = await this.getAccessToken();
@@ -143,7 +196,17 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(`Dataverse Web API request failed. ${response.status} ${response.statusText}: ${errorBody}`);
+      throw new D365ToolError(
+        "connection_failed",
+        `Dataverse Web API request failed. ${response.status} ${response.statusText}.`,
+        {
+          profileName: this.profile.profileName,
+          requestUrl,
+          status: response.status,
+          statusText: response.statusText,
+          responsePreview: errorBody.slice(0, 1000),
+        },
+      );
     }
 
     return (await response.json()) as T;

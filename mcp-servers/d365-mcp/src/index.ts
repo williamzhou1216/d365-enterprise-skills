@@ -2,9 +2,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
-import { getAuthTools } from "./tools/auth-tools.js";
-import { getMetadataTools } from "./tools/metadata-tools.js";
-import { getSolutionTools } from "./tools/solution-tools.js";
+import { getAllTools } from "./tools/index.js";
 import { createRuntime, jsonToolResult, mapToolError } from "./tools/tool-types.js";
 
 async function runCliCommand(command: "profile" | "test-connection"): Promise<void> {
@@ -20,7 +18,7 @@ async function runCliCommand(command: "profile" | "test-connection"): Promise<vo
 
 async function startMcpServer(): Promise<void> {
   const runtime = await createRuntime();
-  const toolDefinitions = [...getAuthTools(runtime), ...getMetadataTools(runtime), ...getSolutionTools()];
+  const toolDefinitions = getAllTools(runtime);
   const toolsByName = new Map(toolDefinitions.map((tool) => [tool.name, tool]));
 
   const server = new Server(

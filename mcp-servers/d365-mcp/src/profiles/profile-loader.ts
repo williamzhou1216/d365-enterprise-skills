@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 
+import { throwToolError } from "../errors.js";
 import {
   type D365ConnectionsFile,
   d365ConnectionsSchema,
@@ -77,7 +78,14 @@ function normalizeWebApiUrl(url: string): string {
 function getRequiredEnvVar(envVarName: string, profileName: string): string {
   const value = process.env[envVarName]?.trim();
   if (!value) {
-    throw new Error(`Environment variable '${envVarName}' is required for profile '${profileName}'.`);
+    throwToolError(
+      "missing_env_var",
+      `Environment variable '${envVarName}' is required for profile '${profileName}'.`,
+      {
+        envVarName,
+        profileName,
+      },
+    );
   }
 
   return value;
@@ -100,18 +108,6 @@ function sanitizeProfile(profileName: string, profile: D365ProfileDefinition): S
     authType: profile.authType,
     apiType: profile.apiType,
     readonly: profile.readonly,
-    urlEnv: profile.urlEnv,
-    webApiUrlEnv: profile.webApiUrlEnv,
-    organizationServiceUrlEnv: profile.organizationServiceUrlEnv,
-    tenantIdEnv: profile.tenantIdEnv,
-    clientIdEnv: profile.clientIdEnv,
-    clientSecretEnv: profile.clientSecretEnv,
-    usernameEnv: profile.usernameEnv,
-    passwordEnv: profile.passwordEnv,
-    domainEnv: profile.domainEnv,
-    adfsUrlEnv: profile.adfsUrlEnv,
-    adfsAuthorityEnv: profile.adfsAuthorityEnv,
-    redirectUriEnv: profile.redirectUriEnv,
     notes: profile.notes,
   };
 }
@@ -123,13 +119,20 @@ function resolveSelectedProfileDefinition(
   const currentProfileName = requestedProfileName || process.env.D365_PROFILE || config.defaultProfile;
 
   if (!currentProfileName) {
-    throw new Error("No D365 profile selected. Set D365_PROFILE or defaultProfile in config/d365-connections.json.");
+    throwToolError(
+      "profile_not_found",
+      "No D365 profile selected. Set D365_PROFILE or defaultProfile in config/d365-connections.json.",
+    );
   }
 
   const selectedProfile = config.profiles[currentProfileName];
   if (!selectedProfile) {
     const availableProfiles = Object.keys(config.profiles).join(", ");
-    throw new Error(`Profile '${currentProfileName}' was not found. Available profiles: ${availableProfiles}`);
+    throwToolError("profile_not_found", `Profile '${currentProfileName}' was not found.`, {
+      requestedProfileName: currentProfileName,
+      availableProfiles: Object.keys(config.profiles),
+      availableProfilesText: availableProfiles,
+    });
   }
 
   return {
@@ -206,7 +209,8 @@ export async function loadConnectionsConfig(): Promise<{
   const connectionsFilePath = resolveConnectionsFilePath(workspaceRoot);
 
   if (!(await pathExists(connectionsFilePath))) {
-    throw new Error(
+    throwToolError(
+      "configuration_error",
       `Connections file not found at '${connectionsFilePath}'. Copy 'config/d365-connections.example.json' to 'config/d365-connections.json' first.`,
     );
   }
@@ -227,6 +231,17 @@ export async function listProfiles(): Promise<SanitizedD365Profile[]> {
   return Object.entries(config.profiles).map(([profileName, profile]) => sanitizeProfile(profileName, profile));
 }
 
+export async function listProfilesWithSummary(): Promise<{
+  defaultProfile?: string;
+  profiles: SanitizedD365Profile[];
+}> {
+  const { config } = await loadConnectionsConfig();
+  return {
+    defaultProfile: config.defaultProfile,
+    profiles: Object.entries(config.profiles).map(([profileName, profile]) => sanitizeProfile(profileName, profile)),
+  };
+}
+
 export async function loadProfile(profileName?: string): Promise<ResolvedD365Profile> {
   const { config } = await loadConnectionsConfig();
   const { profileName: selectedProfileName, profile: selectedProfile } = resolveSelectedProfileDefinition(
@@ -237,10 +252,14 @@ export async function loadProfile(profileName?: string): Promise<ResolvedD365Pro
 }
 
 export async function getCurrentProfileSummary(profileName?: string): Promise<SanitizedD365Profile> {
-  const { config } = await loadConnectionsConfig();
+  const { config, connectionsFilePath, workspaceRoot } = await loadConnectionsConfig();
   const { profileName: selectedProfileName, profile: selectedProfile } = resolveSelectedProfileDefinition(
     config,
     profileName,
   );
-  return sanitizeProfile(selectedProfileName, selectedProfile);
+  const relativeConnectionFile = path.relative(workspaceRoot, connectionsFilePath).replace(/\\/g, "/");
+  return {
+    ...sanitizeProfile(selectedProfileName, selectedProfile),
+    connectionFile: relativeConnectionFile.startsWith(".") ? relativeConnectionFile : `./${relativeConnectionFile}`,
+  };
 }

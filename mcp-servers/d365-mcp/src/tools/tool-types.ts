@@ -1,16 +1,22 @@
-import type { D365AdapterNotImplementedError } from "../adapters/d365-connection-adapter.js";
 import { createConnectionAdapter } from "../adapters/adapter-factory.js";
+import { mapErrorToPayload, notImplementedResult } from "../errors.js";
 import {
   getCurrentProfileSummary,
-  listProfiles,
+  listProfilesWithSummary,
   loadConnectionsConfig,
   loadProfile,
 } from "../profiles/profile-loader.js";
 
+export type D365ToolStatus = "Implemented" | "Partial" | "Planned";
+
 export interface D365ToolDefinition {
   name: string;
+  category: string;
+  status: D365ToolStatus;
   description: string;
   inputSchema: Record<string, unknown>;
+  outputSchema: Record<string, unknown>;
+  promptExample: string;
   handler: (argumentsObject: Record<string, unknown>) => Promise<unknown>;
 }
 
@@ -44,7 +50,7 @@ export async function createRuntime(): Promise<D365ToolRuntime> {
       return getCurrentProfileSummary(profileName);
     },
     async listProfiles() {
-      return listProfiles();
+      return listProfilesWithSummary();
     },
     async testConnection(profileName?: string) {
       const profile = await loadProfile(profileName);
@@ -76,12 +82,9 @@ export async function createRuntime(): Promise<D365ToolRuntime> {
 }
 
 export function mapToolError(error: unknown): unknown {
-  if (typeof error === "object" && error && (error as Error).name === "D365AdapterNotImplementedError") {
-    return (error as D365AdapterNotImplementedError).details;
-  }
+  return mapErrorToPayload(error);
+}
 
-  return {
-    status: "error",
-    message: error instanceof Error ? error.message : String(error),
-  };
+export function buildPlannedToolResult(plannedAdapter: string, message = "This tool is planned but not implemented yet."): unknown {
+  return notImplementedResult(message, plannedAdapter);
 }

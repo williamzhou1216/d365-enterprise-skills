@@ -1,4 +1,5 @@
 import type { ResolvedD365Profile } from "../profiles/d365-profile.js";
+import { D365ToolError } from "../errors.js";
 
 export interface D365ConnectionAdapter {
   connect(): Promise<void>;
@@ -11,7 +12,8 @@ export interface D365ConnectionAdapter {
 }
 
 export interface D365NotImplementedDetails {
-  status: "not_implemented";
+  success: false;
+  errorCode: "not_implemented";
   adapter: string;
   action: string;
   profileName: string;
@@ -22,9 +24,9 @@ export interface D365NotImplementedDetails {
   nextSteps: string[];
 }
 
-export class D365AdapterNotImplementedError extends Error {
+export class D365AdapterNotImplementedError extends D365ToolError {
   constructor(public readonly details: D365NotImplementedDetails) {
-    super(details.message);
+    super("not_implemented", details.message, details, details.adapter);
     this.name = "D365AdapterNotImplementedError";
   }
 }
@@ -35,7 +37,8 @@ export function buildOnPremNotImplementedDetails(
   action: string,
 ): D365NotImplementedDetails {
   return {
-    status: "not_implemented",
+    success: false,
+    errorCode: "not_implemented",
     adapter,
     action,
     profileName: profile.profileName,
@@ -58,4 +61,16 @@ export function throwOnPremNotImplemented(
   action: string,
 ): never {
   throw new D365AdapterNotImplementedError(buildOnPremNotImplementedDetails(profile, adapter, action));
+}
+
+export function throwReadonlyViolation(profile: ResolvedD365Profile, toolName: string): never {
+  throw new D365ToolError(
+    "readonly_violation",
+    `Profile '${profile.profileName}' is readonly. Tool '${toolName}' cannot perform write operations.`,
+    {
+      profileName: profile.profileName,
+      readonly: profile.readonly,
+      toolName,
+    },
+  );
 }
