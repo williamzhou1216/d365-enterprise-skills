@@ -1,0 +1,342 @@
+{
+  "name": "d365-delivery-harness",
+  "version": "1.0.0",
+  "defaultProfileEnv": "D365_PROFILE",
+  "connectionsFileEnv": "D365_CONNECTIONS_FILE",
+  "artifactsRoot": "artifacts",
+  "description": "Delivery execution harness for Dynamics CRM / D365 / Power Platform projects running through OpenCode and d365-mcp.",
+  "entrypoints": {
+    "powershell": "harness/scripts/invoke-harness.ps1",
+    "shell": "harness/scripts/invoke-harness.sh",
+    "operatorGuide": "harness/EXECUTION.md"
+  },
+  "securityRules": [
+    "Treat all production environments as read-only by default.",
+    "Honor profile readonly before any write-class action.",
+    "Never commit secret, password, token, client secret, or connection string values.",
+    "Do not execute production write operations without explicit user confirmation.",
+    "Prefer d365-mcp metadata reads before design or implementation changes.",
+    "Prefer pac CLI for solution packaging and PCF lifecycle operations.",
+    "On-Premises AD, ADFS, and IFD projects must document connector and protocol differences.",
+    "All workflow outputs must be delivery-ready and traceable to inputs and environment assumptions."
+  ],
+  "workflowOrder": [
+    "requirementAnalysis",
+    "fitGapAnalysis",
+    "pluginDevelopment",
+    "webresourceDevelopment",
+    "pcfDevelopment",
+    "powerAutomate",
+    "solutionRelease",
+    "uatTesting",
+    "securityMatrix",
+    "cutoverPlan",
+    "productionSupport"
+  ],
+  "artifactsConvention": {
+    "description": "Workflow outputs are written under artifacts/<workflow-folder>/ with stable delivery filenames.",
+    "rules": [
+      "Keep one top-level artifact folder per workflow.",
+      "Store machine-generated evidence in subfolders like test-results or build-output.",
+      "Do not write secrets, passwords, tokens, or raw connection exports into artifacts.",
+      "Prefer Markdown for customer-facing deliverables and plain folders for test/build evidence.",
+      "Record all created or modified artifact files in the final execution summary."
+    ]
+  },
+  "workflows": {
+    "requirementAnalysis": {
+      "file": "workflows/requirement-analysis.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_list_entities",
+        "d365_get_entity_metadata",
+        "d365_list_forms",
+        "d365_get_form_configuration",
+        "d365_list_views",
+        "d365_generate_field_dictionary",
+        "d365_generate_solution_design_doc"
+      ],
+      "qualityGates": [
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/requirement-analysis/requirements-summary.md",
+        "artifacts/requirement-analysis/assumptions.md",
+        "artifacts/requirement-analysis/entity-scope.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "none"
+    },
+    "fitGapAnalysis": {
+      "file": "workflows/fit-gap-analysis.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_list_entities",
+        "d365_get_entity_metadata",
+        "d365_get_option_set",
+        "d365_list_relationships",
+        "d365_generate_fit_gap_analysis"
+      ],
+      "qualityGates": [
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/fit-gap-analysis/fit-gap-analysis.md",
+        "artifacts/fit-gap-analysis/decision-log.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "none"
+    },
+    "pluginDevelopment": {
+      "file": "workflows/plugin-development.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_get_entity_metadata",
+        "d365_get_attribute_metadata",
+        "d365_list_relationships",
+        "d365_list_plugin_steps",
+        "d365_analyze_plugin_code",
+        "d365_generate_plugin_template",
+        "d365_generate_plugin_registration_note"
+      ],
+      "qualityGates": [
+        "code-quality.gate.md",
+        "d365-plugin.gate.md",
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/plugin-development/plugin-design.md",
+        "artifacts/plugin-development/plugin-registration.md",
+        "artifacts/plugin-development/test-results/"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": true,
+      "requiresNpmBuild": false,
+      "writeAccess": "local-code-only"
+    },
+    "webresourceDevelopment": {
+      "file": "workflows/webresource-development.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_list_webresources",
+        "d365_list_forms",
+        "d365_get_form_configuration",
+        "d365_get_entity_metadata",
+        "d365_get_attribute_metadata",
+        "d365_analyze_webresource_js",
+        "d365_generate_xrm_typings",
+        "d365_generate_webresource_template"
+      ],
+      "qualityGates": [
+        "code-quality.gate.md",
+        "d365-webresource.gate.md",
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/webresource-development/design.md",
+        "artifacts/webresource-development/test-results/",
+        "artifacts/webresource-development/deployment-notes.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": true,
+      "writeAccess": "local-code-only"
+    },
+    "pcfDevelopment": {
+      "file": "workflows/pcf-development.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_get_entity_metadata",
+        "d365_get_attribute_metadata",
+        "d365_list_forms",
+        "d365_get_form_configuration",
+        "d365_generate_xrm_typings"
+      ],
+      "qualityGates": [
+        "code-quality.gate.md",
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/pcf-development/design.md",
+        "artifacts/pcf-development/build-output/",
+        "artifacts/pcf-development/deployment-notes.md"
+      ],
+      "requiresPacCli": true,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": true,
+      "writeAccess": "local-code-only"
+    },
+    "powerAutomate": {
+      "file": "workflows/power-automate.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_get_entity_metadata",
+        "d365_get_attribute_metadata",
+        "d365_get_option_set",
+        "d365_validate_odata_filter",
+        "d365_generate_odata_filter",
+        "d365_analyze_power_automate_flow"
+      ],
+      "qualityGates": [
+        "power-automate.gate.md",
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/power-automate/flow-analysis.md",
+        "artifacts/power-automate/filter-design.md",
+        "artifacts/power-automate/test-checklist.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "design-or-local-json-only"
+    },
+    "solutionRelease": {
+      "file": "workflows/solution-release.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_analyze_solution_folder",
+        "d365_compare_solution_folders",
+        "d365_generate_release_note",
+        "d365_generate_deployment_checklist"
+      ],
+      "qualityGates": [
+        "d365-solution.gate.md",
+        "release-readiness.gate.md",
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/solution-release/release-note.md",
+        "artifacts/solution-release/deployment-checklist.md",
+        "artifacts/solution-release/comparison-report.md"
+      ],
+      "requiresPacCli": true,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "none-by-default"
+    },
+    "uatTesting": {
+      "file": "workflows/uat-testing.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_get_entity_metadata",
+        "d365_list_forms",
+        "d365_get_form_configuration",
+        "d365_list_views",
+        "d365_generate_uat_test_cases"
+      ],
+      "qualityGates": [
+        "security.gate.md",
+        "release-readiness.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/uat-testing/uat-test-cases.md",
+        "artifacts/uat-testing/coverage-matrix.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "none"
+    },
+    "securityMatrix": {
+      "file": "workflows/security-matrix.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_list_entities",
+        "d365_get_entity_metadata",
+        "d365_list_relationships",
+        "d365_generate_security_matrix"
+      ],
+      "qualityGates": [
+        "security.gate.md",
+        "production-safety.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/security-matrix/security-matrix.md",
+        "artifacts/security-matrix/assumptions.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "none"
+    },
+    "cutoverPlan": {
+      "file": "workflows/cutover-plan.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_list_profiles",
+        "d365_test_connection",
+        "d365_analyze_solution_folder",
+        "d365_generate_release_note",
+        "d365_generate_deployment_checklist",
+        "d365_generate_cutover_plan"
+      ],
+      "qualityGates": [
+        "release-readiness.gate.md",
+        "production-safety.gate.md",
+        "security.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/cutover-plan/cutover-plan.md",
+        "artifacts/cutover-plan/rollback-plan.md",
+        "artifacts/cutover-plan/validation-checklist.md"
+      ],
+      "requiresPacCli": true,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "none-by-default"
+    },
+    "productionSupport": {
+      "file": "workflows/production-support.workflow.md",
+      "requiredTools": [
+        "d365_get_current_profile",
+        "d365_test_connection",
+        "d365_get_entity_metadata",
+        "d365_list_forms",
+        "d365_get_form_configuration",
+        "d365_list_views",
+        "d365_analyze_view_fetchxml",
+        "d365_list_plugin_steps",
+        "d365_analyze_plugin_code",
+        "d365_list_webresources",
+        "d365_analyze_webresource_js",
+        "d365_analyze_power_automate_flow",
+        "d365_analyze_solution_folder"
+      ],
+      "qualityGates": [
+        "security.gate.md",
+        "production-safety.gate.md",
+        "release-readiness.gate.md"
+      ],
+      "outputPaths": [
+        "artifacts/production-support/incident-analysis.md",
+        "artifacts/production-support/root-cause.md",
+        "artifacts/production-support/recovery-plan.md"
+      ],
+      "requiresPacCli": false,
+      "requiresDotnetBuild": false,
+      "requiresNpmBuild": false,
+      "writeAccess": "read-only-diagnosis"
+    }
+  }
+}
