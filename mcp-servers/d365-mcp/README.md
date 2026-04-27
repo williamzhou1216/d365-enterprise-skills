@@ -16,6 +16,7 @@ The current implementation uses a TypeScript Node.js MCP server as the control p
 - environment connection checks
 - entity and field metadata analysis
 - field dictionary generation
+- customization dry-run payload generation for selected write scenarios
 - solution folder comparison and release note generation
 - plugin and Web Resource code review
 - OData Filter Rows validation and generation
@@ -174,6 +175,7 @@ Expected behavior:
 - Keep PROD profiles `readonly=true`
 - Customer production environments should usually be metadata-only and read-only from MCP
 - Do not use MCP as a direct write channel to PROD
+- All write-class tools must be blocked when the active profile is `readonly=true`
 - Store On-Premises usernames and passwords in controlled secret storage
 - Manage each customer and environment as a separate profile
 - Do not expose Token, RefreshToken, ClientSecret, or Password in tool outputs
@@ -188,6 +190,16 @@ Important delivery guidance:
 - The current Node.js MCP server is the orchestration layer
 - A future `.NET` CLI should be used as the execution layer for Organization Service scenarios
 
+## 11. Write Tool Execution Policy
+
+Write-class tools follow these rules:
+
+- `dryRun=true`: generate payloads, XML, and execution plans only
+- `dryRun=false`: currently supported only for `online + oauth-client-credentials + webapi + readonly=false`
+- `readonly=true`: all write tools must fail with `readonly_violation`
+- Before real execution, supported tools perform pre-validation such as existence checks for entities, attributes, and views
+- On-Premises write execution is not implemented yet and should later be routed through the `.NET` connector
+
 ## MCP Tools Reference
 
 | Tool | Category | Status | Description |
@@ -201,6 +213,12 @@ Important delivery guidance:
 | d365_get_option_set | Metadata | Partial | Read option set / choice values |
 | d365_list_relationships | Metadata | Partial | List entity relationships |
 | d365_generate_field_dictionary | Metadata | Partial | Generate delivery-ready field dictionary |
+| d365_create_entity | Customization/Write | Partial | Generate dry-run entity creation plan |
+| d365_create_attribute | Customization/Write | Partial | Generate dry-run attribute creation payload |
+| d365_create_form | Customization/Write | Partial | Generate dry-run form creation plan |
+| d365_update_form | Customization/Write | Partial | Generate dry-run form update plan |
+| d365_create_view | Customization/Write | Partial | Generate dry-run view creation payload |
+| d365_update_view | Customization/Write | Partial | Generate dry-run view update payload |
 | d365_list_forms | Forms/Views | Planned | List entity forms |
 | d365_get_form_configuration | Forms/Views | Planned | Read form tabs, sections, controls, handlers |
 | d365_list_views | Forms/Views | Planned | List entity views |
@@ -251,6 +269,14 @@ Important delivery guidance:
 6. UAT 测试用例
 
 “调用 d365_generate_uat_test_cases，为 Customer Service 的 Case 创建、分派、队列处理生成 UAT 测试用例。”
+
+7. 写入类 dry-run
+
+“调用 d365_create_attribute，为 incident 生成一个新字段的 dry-run 创建计划，并输出 Online Web API metadata payload。”
+
+8. 视图 dry-run
+
+“调用 d365_create_view，为 account 生成一个新系统视图的 dry-run 输出，包括 FetchXML 和 LayoutXML。”
 
 ## Tool Details
 
@@ -448,6 +474,129 @@ Important delivery guidance:
 ```
 
 - OpenCode prompt: “基于 account/contact/incident 生成一份字段字典，适合放到客户交付文档中。”
+
+### Customization / Write
+
+#### d365_create_entity
+- Purpose: generate a dry-run entity creation plan and execute the Online `CreateEntity` action when `dryRun=false`
+- Input: `{ "entityLogicalName": "new_project", "schemaName": "new_Project", "displayName": "Project", "pluralDisplayName": "Projects", "primaryNameAttribute": { "logicalName": "new_name", "schemaName": "new_Name", "displayName": "Project Name" }, "dryRun": true }`
+- Output example:
+
+```json
+{
+  "success": true,
+  "toolName": "d365_create_entity",
+  "executionMode": "dry_run",
+  "request": {
+    "method": "POST",
+    "path": "/EntityDefinitions",
+    "body": {}
+  }
+}
+```
+
+- Execution note: when `dryRun=false`, this tool attempts `POST /CreateEntity` and checks that the target entity does not already exist.
+- OpenCode prompt: “为项目管理方案生成一个新自定义实体的 dry-run 创建计划和 Online Web API payload。”
+
+#### d365_create_attribute
+- Purpose: generate a dry-run attribute creation plan and execute Online attribute creation when `dryRun=false`
+- Input: `{ "entityLogicalName": "incident", "attributeLogicalName": "new_customerpriority", "schemaName": "new_CustomerPriority", "displayName": "Customer Priority", "attributeType": "choice", "options": [{ "label": "High" }, { "label": "Medium" }, { "label": "Low" }], "dryRun": true }`
+- Output example:
+
+```json
+{
+  "success": true,
+  "toolName": "d365_create_attribute",
+  "executionMode": "dry_run",
+  "request": {
+    "method": "POST",
+    "path": "/EntityDefinitions(LogicalName='incident')/Attributes",
+    "body": {}
+  }
+}
+```
+
+- Execution note: when `dryRun=false`, this tool attempts `POST /EntityDefinitions(LogicalName='entity')/Attributes` and checks both entity existence and attribute non-existence.
+- OpenCode prompt: “为 incident 生成一个新字段的 dry-run 创建计划，并输出 Online Web API metadata payload。”
+
+#### d365_create_form
+- Purpose: generate a dry-run form creation plan and draft FormXml, including tabs, sections, and controls
+- Input: `{ "entityLogicalName": "incident", "formName": "Case Triage Form", "formType": "main", "tabs": [], "dryRun": true }`
+- Output example:
+
+```json
+{
+  "success": true,
+  "toolName": "d365_create_form",
+  "executionMode": "dry_run",
+  "formXml": "<?xml version=... ?>",
+  "plannedStructure": {
+    "tabCount": 0,
+    "tabs": []
+  }
+}
+```
+
+- OpenCode prompt: “为 incident 设计一个新主窗体，先给我 dry-run 的结构计划和实施说明。”
+
+#### d365_update_form
+- Purpose: generate a dry-run form update plan and FormXml patch draft for libraries, handlers, and controls
+- Input: `{ "entityLogicalName": "incident", "formId": "xxxx", "addLibraries": ["new_/js/case_form.js"], "addEventHandlers": [{ "event": "onload", "libraryName": "new_/js/case_form.js", "functionName": "CaseForm.onLoad" }], "dryRun": true }`
+- Output example:
+
+```json
+{
+  "success": true,
+  "toolName": "d365_update_form",
+  "executionMode": "dry_run",
+  "formXmlPatch": "<?xml version=... ?>",
+  "updatePlan": {
+    "addLibraries": ["new_/js/case_form.js"],
+    "addEventHandlers": []
+  }
+}
+```
+
+- OpenCode prompt: “为 incident 现有主窗体生成一次更新的 dry-run 计划，包括新增 JS 库和事件处理器。”
+
+#### d365_create_view
+- Purpose: generate FetchXML, LayoutXML, and execute Online savedquery creation when `dryRun=false`
+- Input: `{ "entityLogicalName": "account", "viewName": "Active Accounts By City", "columns": [{ "logicalName": "name", "width": 200 }, { "logicalName": "address1_city", "width": 120 }], "conditions": [{ "attribute": "statecode", "operator": "eq", "value": 0 }], "orders": [{ "attribute": "name", "descending": false }], "dryRun": true }`
+- Output example:
+
+```json
+{
+  "success": true,
+  "toolName": "d365_create_view",
+  "executionMode": "dry_run",
+  "fetchXml": "<fetch>...</fetch>",
+  "layoutXml": "<grid>...</grid>"
+}
+```
+
+- Execution note: when `dryRun=false`, this tool attempts `POST /savedqueries`, checks that the entity exists, validates referenced columns, and checks that the view name does not already exist.
+- OpenCode prompt: “为 account 生成一个新系统视图的 dry-run 输出，包括 FetchXML 和 LayoutXML。”
+
+#### d365_update_view
+- Purpose: generate FetchXML, LayoutXML, and execute Online savedquery update when `dryRun=false`
+- Input: `{ "viewId": "xxxx", "entityLogicalName": "account", "viewName": "Active Accounts By City", "columns": [{ "logicalName": "name", "width": 200 }], "dryRun": true }`
+- Output example:
+
+```json
+{
+  "success": true,
+  "toolName": "d365_update_view",
+  "executionMode": "dry_run",
+  "request": {
+    "entityName": "savedquery",
+    "id": "xxxx",
+    "body": {}
+  }
+}
+```
+
+- Execution note: when `dryRun=false`, this tool attempts `PATCH /savedqueries(<viewId>)`, validates the target view ID, and validates referenced columns before update.
+- OpenCode prompt: “更新 account 现有系统视图，先输出 dry-run 的 FetchXML 和 LayoutXML 更新计划。”
 
 ### Forms/Views
 

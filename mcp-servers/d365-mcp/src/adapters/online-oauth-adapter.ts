@@ -1,23 +1,16 @@
-import { fetch } from "undici";
-
-import { D365ToolError } from "../errors.js";
 import type { ResolvedD365Profile } from "../profiles/d365-profile.js";
 import type { D365ConnectionAdapter } from "./d365-connection-adapter.js";
-
-interface OAuthTokenResponse {
-  access_token: string;
-  expires_in: number;
-  token_type: string;
-}
+import { OnlineWebApiClient } from "./online-webapi-client.js";
 
 export class OnlineOAuthAdapter implements D365ConnectionAdapter {
-  private accessToken?: string;
-  private accessTokenExpiresAt = 0;
+  private readonly client: OnlineWebApiClient;
 
-  constructor(private readonly profile: ResolvedD365Profile) {}
+  constructor(private readonly profile: ResolvedD365Profile) {
+    this.client = new OnlineWebApiClient(profile);
+  }
 
   async connect(): Promise<void> {
-    await this.getAccessToken();
+    await this.client.getAccessToken();
   }
 
   async testConnection(): Promise<unknown> {
@@ -122,93 +115,7 @@ export class OnlineOAuthAdapter implements D365ConnectionAdapter {
     ];
   }
 
-  private async getAccessToken(): Promise<string> {
-    const now = Date.now();
-    if (this.accessToken && now < this.accessTokenExpiresAt - 60_000) {
-      return this.accessToken;
-    }
-
-    if (!this.profile.url || !this.profile.tenantId || !this.profile.clientId || !this.profile.clientSecret) {
-      throw new D365ToolError("missing_env_var", "Online OAuth profile is missing one or more resolved credentials.", {
-        profileName: this.profile.profileName,
-      });
-    }
-
-    const tokenUrl = `https://login.microsoftonline.com/${this.profile.tenantId}/oauth2/v2.0/token`;
-    const dataverseOrigin = new URL(this.profile.url).origin;
-
-    const body = new URLSearchParams({
-      grant_type: "client_credentials",
-      client_id: this.profile.clientId,
-      client_secret: this.profile.clientSecret,
-      scope: `${dataverseOrigin}/.default`,
-    });
-
-    const response = await fetch(tokenUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      body,
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new D365ToolError(
-        "connection_failed",
-        `Failed to acquire Dataverse token. ${response.status} ${response.statusText}.`,
-        {
-          profileName: this.profile.profileName,
-          status: response.status,
-          statusText: response.statusText,
-          responsePreview: errorBody.slice(0, 1000),
-        },
-      );
-    }
-
-    const token = (await response.json()) as OAuthTokenResponse;
-    this.accessToken = token.access_token;
-    this.accessTokenExpiresAt = now + token.expires_in * 1000;
-    return token.access_token;
-  }
-
   private async requestJson<T>(relativePath: string): Promise<T> {
-    if (!this.profile.webApiUrl) {
-      throw new D365ToolError("configuration_error", "Resolved profile is missing webApiUrl.", {
-        profileName: this.profile.profileName,
-      });
-    }
-
-    const accessToken = await this.getAccessToken();
-    const webApiBaseUrl = this.profile.webApiUrl.replace(/\/$/, "");
-    const requestUrl = `${webApiBaseUrl}/${relativePath.replace(/^\//, "")}`;
-
-    const response = await fetch(requestUrl, {
-      method: "GET",
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-        accept: "application/json",
-        "odata-version": "4.0",
-        "odata-maxversion": "4.0",
-        prefer: 'odata.include-annotations="*"',
-      },
-    });
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new D365ToolError(
-        "connection_failed",
-        `Dataverse Web API request failed. ${response.status} ${response.statusText}.`,
-        {
-          profileName: this.profile.profileName,
-          requestUrl,
-          status: response.status,
-          statusText: response.statusText,
-          responsePreview: errorBody.slice(0, 1000),
-        },
-      );
-    }
-
-    return (await response.json()) as T;
+    return this.client.get<T>(relativePath);
   }
 }

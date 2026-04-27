@@ -63,7 +63,10 @@ export function throwOnPremNotImplemented(
   throw new D365AdapterNotImplementedError(buildOnPremNotImplementedDetails(profile, adapter, action));
 }
 
-export function throwReadonlyViolation(profile: ResolvedD365Profile, toolName: string): never {
+export function throwReadonlyViolation(
+  profile: Pick<ResolvedD365Profile, "profileName" | "readonly">,
+  toolName: string,
+): never {
   throw new D365ToolError(
     "readonly_violation",
     `Profile '${profile.profileName}' is readonly. Tool '${toolName}' cannot perform write operations.`,
