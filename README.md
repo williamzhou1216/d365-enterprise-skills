@@ -23,6 +23,7 @@ This repo contains D365 + Power Platform skills, one skill per folder, each with
 - dataverse-data-architect
 - security-role-designer
 - d365-integration-architect
+- d365-sso-integration-architect
 - azure-integration-expert
 - d365-plugin-developer
 - d365-client-unit-test-expert
@@ -39,6 +40,10 @@ This repo contains D365 + Power Platform skills, one skill per folder, each with
 - performance-optimizer
 - data-governance-expert
 - vyung-d365-plugin-standard
+
+## Identity And Access Notes
+- `d365-sso-integration-architect` is intended for CRM identity integration with local SSO platforms, with explicit design branching for `online` and `op` deployment modes.
+- The skill should be used when the main problem is login federation, SSO trust chain, ADFS / IFD / Entra ID alignment, or rollout / rollback planning for CRM authentication changes.
 
 ## Recommended Template Assets
 - `templates/proposal_template.md`: client-facing proposal skeleton
@@ -74,6 +79,7 @@ This repo contains D365 + Power Platform skills, one skill per folder, each with
 - dataverse-data-architect
 - security-role-designer
 - d365-integration-architect
+- d365-sso-integration-architect
 - azure-integration-expert
 
 ### engineering
@@ -110,3 +116,55 @@ Quick start:
 2. Fill in `.env.local`
 3. Copy `.opencode/opencode.example.jsonc` to `.opencode/opencode.jsonc`
 4. Set `D365_PROFILE` and start OpenCode
+
+## Harness Quick Start
+
+This repo also includes a delivery execution harness for Dynamics CRM projects.
+
+- Harness root: `harness/`
+- Operator guide: `harness/EXECUTION.md`
+- Machine-readable config: `harness/harness.config.json`
+- Artifact register: `artifacts/index.md`
+
+Recommended start sequence:
+
+1. Set `D365_PROFILE`
+2. Pick the target workflow key, for example `requirementAnalysis`, `pluginDevelopment`, or `solutionRelease`
+3. Run the harness entrypoint to print the exact OpenCode execution prompt
+
+PowerShell:
+
+```powershell
+pwsh -NoProfile -File .\harness\scripts\invoke-harness.ps1 -Workflow requirementAnalysis
+```
+
+Linux / macOS:
+
+```bash
+./harness/scripts/invoke-harness.sh requirementAnalysis
+```
+
+To refresh the artifact register summary first:
+
+PowerShell:
+
+```powershell
+pwsh -NoProfile -File .\harness\scripts\invoke-harness.ps1 -Workflow solutionRelease -RefreshArtifactsIndex -ProjectName "CRM Modernization" -MaintainerName "Delivery PMO"
+```
+
+Linux / macOS:
+
+```bash
+./harness/scripts/invoke-harness.sh solutionRelease --refresh-artifacts-index --project-name "CRM Modernization" --maintainer-name "Delivery PMO"
+```
+
+Recommended first workflows by scenario:
+
+- requirements and discovery: `requirementAnalysis`
+- fit-gap decisioning: `fitGapAnalysis`
+- plugin work: `pluginDevelopment`
+- Web Resource / form script work: `webresourceDevelopment`
+- Power Automate / OData filter work: `powerAutomate`
+- solution packaging and release note work: `solutionRelease`
+- cutover and go-live runbook work: `cutoverPlan`
+- production issue diagnosis: `productionSupport`
