@@ -2,6 +2,13 @@
   "name": "d365-master-agent",
   "description": "D365 Enterprise Skills master agent (detailed version)",
   "strategy": "multi-skill",
+  "harness": {
+    "enabled": true,
+    "entrypoint": "harness/scripts/invoke-harness.ps1",
+    "operatorGuide": "harness/EXECUTION.md",
+    "artifactsIndex": "artifacts/index.md",
+    "recommendationRule": "When the request is execution-oriented, recommend the matching harness workflow before or alongside the specialist skill output."
+  },
   "routing": [
     {
       "keywords": [
@@ -30,7 +37,8 @@
         "标准",
         "定制"
       ],
-      "skill": "consulting/fit-gap-analyst"
+      "skill": "consulting/fit-gap-analyst",
+      "recommendedWorkflow": "fitGapAnalysis"
     },
     {
       "keywords": [
@@ -132,6 +140,24 @@
     },
     {
       "keywords": [
+        "sso",
+        "单点登录",
+        "本地sso",
+        "联合认证",
+        "身份联邦",
+        "adfs",
+        "claims",
+        "ifd",
+        "saml",
+        "oidc",
+        "oauth",
+        "ws-fed",
+        "entra id"
+      ],
+      "skill": "architecture/d365-sso-integration-architect"
+    },
+    {
+      "keywords": [
         "集成",
         "sap",
         "oms",
@@ -166,17 +192,21 @@
         "custom api",
         "插件"
       ],
-      "skill": "engineering/d365-plugin-developer"
+      "skill": "engineering/d365-plugin-developer",
+      "recommendedWorkflow": "pluginDevelopment"
     },
     {
       "keywords": [
         "flow",
         "power automate",
+        "odata",
+        "filter rows",
         "审批",
         "异常",
         "性能"
       ],
-      "skill": "engineering/power-automate-architect"
+      "skill": "engineering/power-automate-architect",
+      "recommendedWorkflow": "powerAutomate"
     },
     {
       "keywords": [
@@ -185,7 +215,8 @@
         "用例",
         "覆盖"
       ],
-      "skill": "delivery/test-case-designer"
+      "skill": "delivery/test-case-designer",
+      "recommendedWorkflow": "uatTesting"
     },
     {
       "keywords": [
@@ -201,9 +232,12 @@
         "上线",
         "发布",
         "部署",
-        "迁移"
+        "迁移",
+        "release",
+        "solution"
       ],
-      "skill": "delivery/release-deployment-manager"
+      "skill": "delivery/release-deployment-manager",
+      "recommendedWorkflow": "solutionRelease"
     },
     {
       "keywords": [
@@ -213,7 +247,8 @@
         "日志",
         "API"
       ],
-      "skill": "operations/d365-troubleshooting-expert"
+      "skill": "operations/d365-troubleshooting-expert",
+      "recommendedWorkflow": "productionSupport"
     },
     {
       "keywords": [
@@ -241,7 +276,8 @@
         "需求规格",
         "规格书"
       ],
-      "skill": "delivery/d365-requirement-spec-writer"
+      "skill": "delivery/d365-requirement-spec-writer",
+      "recommendedWorkflow": "requirementAnalysis"
     },
     {
       "keywords": [
@@ -285,6 +321,56 @@
         "后端测试"
       ],
       "skill": "engineering/d365-server-unit-test-expert"
+    },
+    {
+      "keywords": [
+        "webresource",
+        "web resource",
+        "form script",
+        "uci js",
+        "javascript",
+        "脚本"
+      ],
+      "skill": "engineering/d365-client-unit-test-expert",
+      "recommendedWorkflow": "webresourceDevelopment"
+    },
+    {
+      "keywords": [
+        "pcf",
+        "control",
+        "component framework"
+      ],
+      "skill": "engineering/d365-client-unit-test-expert",
+      "recommendedWorkflow": "pcfDevelopment"
+    },
+    {
+      "keywords": [
+        "security matrix",
+        "权限矩阵",
+        "role matrix"
+      ],
+      "skill": "architecture/security-role-designer",
+      "recommendedWorkflow": "securityMatrix"
+    },
+    {
+      "keywords": [
+        "cutover",
+        "切换计划",
+        "rollback",
+        "go live"
+      ],
+      "skill": "delivery/release-deployment-manager",
+      "recommendedWorkflow": "cutoverPlan"
+    },
+    {
+      "keywords": [
+        "harness",
+        "workflow",
+        "delivery workflow",
+        "artifacts index"
+      ],
+      "skill": "delivery/d365-technical-plan-designer",
+      "recommendedWorkflow": "requirementAnalysis"
     }
   ]
 }

@@ -250,6 +250,14 @@ powershell -ExecutionPolicy Bypass -File .\harness\scripts\invoke-harness.ps1 -W
 
 These helper scripts do not execute CRM writes. They print the selected workflow metadata and a copy-ready OpenCode prompt that uses the harness contract.
 
+To refresh the artifact register summary at the same time:
+
+```powershell
+pwsh -NoProfile -File .\harness\scripts\invoke-harness.ps1 -Workflow solutionRelease -RefreshArtifactsIndex -ProjectName "CRM Modernization" -MaintainerName "Delivery PMO"
+```
+
+This updates the auto-generated section at the top of `artifacts/index.md` with the latest workflow summary, PM view, and gate roll-up.
+
 Recommended commands:
 
 Profile and connection:

@@ -49,6 +49,7 @@ The helper script:
 - prints the workflow file path
 - prints required MCP tools, gates, and output paths
 - prints a copy-ready OpenCode prompt block
+- can refresh `artifacts/index.md` automatically when `-RefreshArtifactsIndex` is supplied
 
 The helper script does not:
 
@@ -72,6 +73,15 @@ The helper script does not:
 $env:D365_PROFILE = "customerA-online-dev"
 powershell -ExecutionPolicy Bypass -File .\harness\scripts\invoke-harness.ps1 -Workflow requirementAnalysis
 ```
+
+## Example: Refresh The Artifact Index First
+
+```powershell
+$env:D365_PROFILE = "customerA-online-dev"
+pwsh -NoProfile -File .\harness\scripts\invoke-harness.ps1 -Workflow solutionRelease -RefreshArtifactsIndex -ProjectName "CRM Modernization" -MaintainerName "Delivery PMO"
+```
+
+Use this when you want the harness entrypoint to refresh the auto-generated summary section of `artifacts/index.md` before running the next workflow.
 
 ## Example: Plugin Development
 
